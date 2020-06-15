@@ -18,10 +18,7 @@
 #include "arm_math.h"
 #include "arm_const_structs.h"
 
-
-
 #define INTB_PIN PTC4
-
 
 #define MTSTART 8000
 
@@ -153,9 +150,7 @@ char lcdtxt[5]; // text to display
 // debug
 Serial pc(USBTX, USBRX);
 
-
 I2C i2c(PTC11, PTC10);
-//I2C i2c_lcd(PTB1, PTB0); //(PTC9, PTC8);
 
 // FDC2214 configuration params have two bytes, msb and lsb here refer to bytes, not bits : )
 typedef struct cfg_param_s
@@ -165,33 +160,6 @@ typedef struct cfg_param_s
     char c_param_lsb;
 } cfg_param_t;
 // Take these settings from TI's eval board PC software in Menu->Registers window
-#ifdef OLD
-cfg_param_t cfg_arr[]={
-    {CMD_RCOUNT_CH0, 0xff, 0xff},
-    {CMD_RCOUNT_CH1, 0xff, 0xff},
-    {CMD_RCOUNT_CH2, 0xff, 0xff},
-    {CMD_RCOUNT_CH3, 0xff, 0xff},
-    {CMD_OFFSET_CH0, 0x00, 0x00},
-    {CMD_OFFSET_CH1, 0x00, 0x00},
-    {CMD_OFFSET_CH2, 0x00, 0x00},
-    {CMD_OFFSET_CH3, 0x00, 0x00},
-    {CMD_SETTLECOUNT_CH0, 0x04, 0x00},
-    {CMD_SETTLECOUNT_CH1, 0x04, 0x00},
-    {CMD_SETTLECOUNT_CH2, 0x04, 0x00},
-    {CMD_SETTLECOUNT_CH3, 0x04, 0x00},
-    {CMD_CLOCK_DIVIDERS_CH0, 0x10, 0x01},
-    {CMD_CLOCK_DIVIDERS_CH1, 0x10, 0x01},
-    {CMD_CLOCK_DIVIDERS_CH2, 0x10, 0x01},
-    {CMD_CLOCK_DIVIDERS_CH3, 0x10, 0x01},
-    {CMD_DRIVE_CURRENT_CH0, 0x88, 0x00},
-    {CMD_DRIVE_CURRENT_CH1, 0x88, 0x00},
-    {CMD_DRIVE_CURRENT_CH2, 0x88, 0x00},
-    {CMD_DRIVE_CURRENT_CH3, 0x88, 0x00},
-    {CMD_ERROR_CONFIG, 0x00, 0x01},
-    {CMD_MUX_CONFIG, 0x82, 0x0c},
-    {CMD_CONFIG, 0x1e, 0x01},
-    {CMD_FIN, 0xff, 0xff}};
-#endif
 cfg_param_t cfg_arr[]={
     {CMD_RCOUNT_CH0, 0x20, 0x00},
     {CMD_RCOUNT_CH1, 0x20, 0x00},
@@ -567,8 +535,6 @@ void lcd_print_line(char* line)
   i2c.write(LCD_I2C_ADDR, lcdbuf, 10);
 }
 
-
-
 // main() runs in its own thread in the OS
 int
 main(void)
@@ -583,7 +549,7 @@ main(void)
     unsigned int oldact[BNUM]; // crude output filter. good enough!
         
     myled=LED_OFF; // switch off the LED
-    
+  
     int not_finished=1;
     int i=0;
     
@@ -593,7 +559,7 @@ main(void)
     pc.printf("Hello\n\r");
     
     i2c.frequency(100000);
-    //i2c_lcd.frequency(400000);
+  
     wait(0.1); // LCD needs a few msec
     lcd_init();
     for (i=0; i<5; i++) {
@@ -608,7 +574,7 @@ main(void)
     }
 
     // transform stuff
-    S=& arm_cfft_sR_f32_len16;
+    S = &arm_cfft_sR_f32_len16;
     
     // handle FDC2214 startup
     shut=1; // put FDC2214 into shutdown
@@ -666,8 +632,6 @@ main(void)
                 }
             }
             
-            
-            
             // test to see if we have sufficient hand-swipe activity.
             // 4000 worked fine but so did 3000. It's not a super critical value
             for (i=0; i<BNUM; i++) {
@@ -686,7 +650,6 @@ main(void)
                             myled=LED_ON;
                             lcdtxt[i]=i+1+'0';
                             lcd_print_line(lcdtxt);
-                         
                         }
                         else
                         {
@@ -695,7 +658,6 @@ main(void)
                             lcdtxt[i]=' ';
                             lcd_print_line(lcdtxt);
                         }
-                
                     }    
                 }
                 else if ((act[i]<=MT) && (oldact[i]<=MT))
